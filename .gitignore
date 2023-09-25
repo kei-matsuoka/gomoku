@@ -12,3 +12,9 @@ docs/
 
 # Dotenv file
 .env
+
+# Node version
+.node-version
+
+# Mac
+.DS_Store
