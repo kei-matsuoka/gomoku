@@ -2,18 +2,18 @@
 pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {Gomoku} from "../src/Gomoku.sol";
+import {GomokuV1} from "../src/GomokuV1.sol";
 import {Game} from "../src/Game.sol";
 
 contract GameTest is Test {
-    Gomoku public gomoku;
+    GomokuV1 public gomoku;
     Game public game;
 
     address public player1 = address(0x1);
     address public player2 = address(0x2);
 
     function setUp() public {
-        game = gomoku.games(1);
+        game = new Game(0, player1);
     }
 
     function test_Player1() public {

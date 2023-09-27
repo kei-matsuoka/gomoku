@@ -2,19 +2,17 @@
 pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {Gomoku} from "../src/Gomoku.sol";
-import {Game} from "../src/Game.sol";
+import {GomokuV1} from "../src/GomokuV1.sol";
 
-contract GomokuTest is Test {
-    Gomoku public gomoku;
-    Game public game;
+contract GomokuV1Test is Test {
+    GomokuV1 public gomoku;
 
     function setUp() public {
-        gomoku = new Gomoku();
+        gomoku = new GomokuV1();
     }
 
     function test_createGame() public {
         gomoku.createGame();
-        assertEq(gomoku.games(1).id(), 1);
+        assertEq(gomoku.gameId(), 1);
     }
 }
