@@ -6,7 +6,6 @@ import {GomokuV1} from "../src/GomokuV1.sol";
 import {Game} from "../src/Game.sol";
 
 contract GameTest is Test {
-    GomokuV1 public gomoku;
     Game public game;
 
     address public player1 = address(0x1);
@@ -16,34 +15,31 @@ contract GameTest is Test {
         game = new Game(0, player1);
     }
 
-    function test_Player1() public {
+    function test_Init() public {
         assertEq(game.player1(), player1);
-    }
-
-    function test_InitTurn() public {
         assertEq(game.turn(), player1);
-    }
-
-    function test_InitState() public {
         assertEq(uint256(game.state()), 0);
     }
 
-    function test_Player2() public {
-        game.setPlayer2(player2);
-        assertEq(game.player2(), player2);
+    function test_OpenGame() public {
+        game.openGame();
         assertEq(uint256(game.state()), 1);
     }
 
-    function test_ChangeTurn() public {
+    function test_SetPlayer2() public {
+        game.openGame();
         game.setPlayer2(player2);
+        assertEq(game.player2(), player2);
         assertEq(game.turn(), player1);
-        game.changeTurn();
-        assertEq(game.turn(), player2);
+        assertEq(uint256(game.state()), 2);
     }
 
-    function test_Judge() public {
+    function test_PlaceStone() public {
+        game.openGame();
         game.setPlayer2(player2);
         game.placeStone(0, 0, player1);
+        assertEq(game.board(0, 0), player1);
+        assertEq(game.turn(), player2);
         game.placeStone(1, 0, player2);
         game.placeStone(0, 1, player1);
         game.placeStone(1, 1, player2);
@@ -51,19 +47,13 @@ contract GameTest is Test {
         game.placeStone(1, 2, player2);
         game.placeStone(0, 3, player1);
         game.placeStone(1, 3, player2);
-        assertEq(uint256(game.state()), 1);
-        game.placeStone(0, 4, player1);
         assertEq(uint256(game.state()), 2);
-    }
-
-    function test_PlaceStone() public {
-        game.setPlayer2(player2);
-        game.placeStone(0, 0, player1);
-        assertEq(game.board(0, 0), player1);
-        assertEq(game.turn(), player2);
+        game.placeStone(0, 4, player1);
+        assertEq(uint256(game.state()), 3);
     }
 
     function test_GetBoard() public {
+        game.openGame();
         game.setPlayer2(player2);
         game.placeStone(0, 0, player1);
         assertEq(game.turn(), player2);

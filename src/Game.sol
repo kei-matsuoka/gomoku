@@ -5,7 +5,8 @@ contract Game {
     uint256 public id; //初期化時に設定
     // gameの状態
     enum State {
-        Waiting,
+        None,
+        Opening,
         Playing,
         Finished
     }
@@ -19,27 +20,33 @@ contract Game {
     // player2
     address public player2;
 
-    // 初期化でGame作成者をplayer1にする&turnをplayer1にする&stateをWaitingにする
+    // 初期化でGame作成者をplayer1にする&turnをplayer1にする&stateをNoneにする
     constructor(uint256 _id, address _player1) {
         id = _id;
         player1 = _player1;
         turn = player1;
-        state = State.Waiting;
+        state = State.None;
+    }
+
+    // player1だけがnoneからopeningにできる
+    function openGame() public {
+        // player1であることを確認
+        // require(msg.sender == player1, "Not player1");
+        // stateがNoneであることを確認
+        require(state == State.None, "Game is not None");
+        state = State.Opening;
     }
 
     // player2を設定する&stateをPlayingにする
     function setPlayer2(address _player2) public {
+        // stateがOpeningであることを確認
+        require(state == State.Opening, "Game is not Opening");
+        // player2が設定されていないことを確認
+        require(player2 == address(0), "Player2 is already set");
+        // player1は設定できないことを確認
+        require(_player2 != player1, "Player1 cannot be Player2");
         player2 = _player2;
         state = State.Playing;
-    }
-
-    // turnを切り替える
-    function changeTurn() public {
-        if (turn == player1) {
-            turn = player2;
-        } else {
-            turn = player1;
-        }
     }
 
     // boardに碁石を置く
@@ -60,12 +67,16 @@ contract Game {
             state = State.Finished;
         } else {
             // 勝敗が決まっていなかったらturnを切り替える
-            changeTurn();
+            if (turn == player1) {
+                turn = player2;
+            } else {
+                turn = player1;
+            }
         }
     }
 
     // 19*19の碁盤内で5つ連続で石が置かれているかを確認する
-    function judge(address player) public view returns (bool) {
+    function judge(address player) internal view returns (bool) {
         for (uint8 x = 0; x < 19; x++) {
             for (uint8 y = 0; y < 19; y++) {
                 if (board[x][y] == player) {
@@ -90,7 +101,7 @@ contract Game {
         int8 dx,
         int8 dy,
         address player
-    ) public view returns (bool) {
+    ) internal view returns (bool) {
         uint8 count = 1; // 1つ目の自分の石をカウント
         for (int8 step = 1; step <= 4; step++) {
             int8 nx = int8(x) + step * dx;
