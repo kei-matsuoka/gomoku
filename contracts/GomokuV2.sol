@@ -4,9 +4,9 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "./Game.sol";
+import "./GameV2.sol";
 
-contract GomokuV1 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract GomokuV2 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // GameProxyAddressのidを保持する
     uint256 public gameId;
     // GameProxyAddress一覧を保持する
@@ -30,7 +30,7 @@ contract GomokuV1 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     // gameを作成する
     function createGame() public {
-        address gameAddress = address(new Game(gameId, msg.sender));
+        address gameAddress = address(new GameV2(gameId, msg.sender));
         games[gameId] = gameAddress;
         gameId++;
     }
