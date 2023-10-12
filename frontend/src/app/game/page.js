@@ -2,12 +2,11 @@
 
 import { useState } from 'react';
 import { ethers } from 'ethers';
-import game from '../../../../artifacts/contracts/GameV2.sol/GameV2.json';
+import game from '@/abis/GameV2.json';
 
 export default function Game() {
   const [signer, setSigner] = useState(null);
   const [address, setAddress] = useState();
-  const [gameContract, setGameContract] = useState();
   const [player1, setPlayer1] = useState();
   const [player2, setPlayer2] = useState();
   const [gameStatus, setGameStatus] = useState();
@@ -23,8 +22,6 @@ export default function Game() {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
-        const gameContract = new ethers.Contract(gameAddress, gameAbi, signer);
-        setGameContract(gameContract);
         setSigner(signer);
         const address = await signer.getAddress();
         setAddress(address);

@@ -1,20 +1,21 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import gomokuV1 from '../../../artifacts/contracts/GomokuV1.sol/GomokuV1.json';
-import game from '../../../artifacts/contracts/Game.sol/Game.json';
+import gomoku from '@/abis/GomokuV2.json';
+import game from '@/abis/GameV2.json';
+import Link from 'next/link';
 
 export default function Home() {
   const [signer, setSigner] = useState(null);
-  const [gomokuV1Contract, setGomokuV1Contract] = useState(null);
+  const [gomokuContract, setGomokuContract] = useState(null);
   const [address, setAddress] = useState('');
   const [games, setGames] = useState([]);
   const [player1s, setPlayer1s] = useState([]);
   const [player2s, setPlayer2s] = useState([]);
   const [gameStatuses, setGameStatuses] = useState([]);
 
-  const gomokuV1Abi = gomokuV1.abi;
+  const gomokuAbi = gomoku.abi;
   const gameAbi = game.abi;
   const erc1967ProxyAddress = '0x9B754E4ed74F5109E28C3B07379534e1aAE4d5B6';
 
@@ -25,8 +26,8 @@ export default function Home() {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         setSigner(signer);
-        const gomokuV1Contract = new ethers.Contract(erc1967ProxyAddress, gomokuV1Abi, signer);
-        setGomokuV1Contract(gomokuV1Contract);
+        const gomokuContract = new ethers.Contract(erc1967ProxyAddress, gomokuAbi, signer);
+        setGomokuContract(gomokuContract);
         const address = await signer.getAddress();
         setAddress(address);
       } catch (err) {
@@ -38,14 +39,14 @@ export default function Home() {
   }
 
   const createGame = async () => {
-    const tx = await gomokuV1Contract.createGame();
+    const tx = await gomokuContract.createGame();
     await tx.wait();
     console.log("tx:", tx);
     await getGames();
   }
 
   const getGames = async () => {
-      const games = await gomokuV1Contract.getGames();
+      const games = await gomokuContract.getGames();
       setGames(games);
       // gamesの数だけgameコントラクトのインスタンスを作成し、それぞれでplayer1を取得する
       for (let i = 0; i < games.length; i++) {
@@ -85,6 +86,14 @@ export default function Home() {
         ウォレットに接続
       </button>
 
+      {/* getGamesボタン */}
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded mt-4 ml-4"
+        onClick={getGames}
+      >
+        ゲーム一覧を取得
+      </button>
+      
       {/* createGameボタン */}
       <button
         className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded mt-4 ml-4"
@@ -93,13 +102,13 @@ export default function Home() {
         ゲームを作成
       </button>
 
-      {/* getGamesボタン */}
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded mt-4 ml-4"
-        onClick={getGames}
+      {/* gameページへのリンクボタン */}
+      <Link
+        href="/game"
+        className="bg-red-500 hover:bg-red-700 text-white py-2.5 px-4 rounded mt-4 ml-4"
       >
-        ゲーム一覧を取得
-      </button>
+        ゲームをプレイする
+      </Link>
 
       {address ? <p className='mt-4 ml-4'>接続中: {address}</p> : <p className='mt-4 ml-4'>未接続</p>}
 
